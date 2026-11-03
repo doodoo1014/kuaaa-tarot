@@ -11,7 +11,7 @@
 //   ANTHROPIC_WORKSPACE_ID  (선택) 키를 워크스페이스에 묶지 않았을 때만 필요해요
 
 const MODEL = 'claude-haiku-5-5';
-const MAX_TOKENS = 1200;            // 풀이 300~450자에 넉넉한 상한
+const MAX_TOKENS = 1600;            // 가장 긴 파이브 카드 풀이(450~650자)에도 넉넉한 상한
 const PER_IP_LIMIT = 20;            // 같은 IP에서 5분에 20번까지 (학교 와이파이처럼 여럿이 한 IP를 써도 버틸 정도)
 const DEFAULT_ORIGINS = ['https://doodoo1014.github.io'];
 const WINDOW_MS = 5 * 60 * 1000;
@@ -106,23 +106,54 @@ const CARDS = [
    rv:['미완성','마무리 부족','지연'], rvT:'거의 다 왔지만 마지막 한 조각이 남아 있어요. 끝맺음을 미루지 말고 마무리하세요.',
    sky:'둥근 장미 모양 성운이 세계 카드 속 인물을 감싼 월계관을 닮았어요. 한가운데 젊은 별무리가 안쪽을 비워 둥근 꽃 모양을 만들었어요.'}
 ];
+const L3 = '2~3문단, 모두 합쳐 300~450자';
+// 사이트(index.html)의 SPREADS와 키·장수가 같아야 해요. 궁합의 {A} {B}는 이름으로 바뀌어요.
 const SPREADS = {
-  today: {name:'오늘의 카드', pos:[{t:'오늘의 메시지', d:'오늘 하루 마음에 둘 이야기'}]},
-  ppf:   {name:'과거 · 현재 · 미래', pos:[{t:'과거', d:'지금에 이르게 한 흐름'},{t:'현재', d:'지금 마주한 상황'},{t:'미래', d:'이대로 갈 때의 방향'}]},
-  fork:  {name:'두 갈래 길', pos:[{t:'선택 A', d:'첫 번째 길을 고르면'},{t:'선택 B', d:'두 번째 길을 고르면'},{t:'조언', d:'고르기 전에 기억할 것'}]}
+  one:    {name:'원 카드', len:'2문단, 모두 합쳐 200~300자',
+           pos:[{t:'메시지', d:'지금 마음에 둘 이야기'}]},
+  ppf:    {name:'과거 · 현재 · 미래', len:L3,
+           pos:[{t:'과거', d:'지금에 이르게 한 흐름'},{t:'현재', d:'지금 마주한 상황'},{t:'미래', d:'이대로 갈 때의 방향'}]},
+  sao:    {name:'상황 · 장애 · 조언', len:L3,
+           pos:[{t:'상황', d:'지금 놓인 자리'},{t:'장애', d:'앞을 가로막는 것'},{t:'조언', d:'풀어 갈 실마리'}]},
+  rel:    {name:'나 · 상대 · 관계', len:L3,
+           guide:"'나'는 질문한 사람, '상대'는 질문 속 상대예요. 상대의 마음은 단정하지 말고 '~일 수 있어요'처럼 조심스럽게 써요.",
+           pos:[{t:'나', d:'이 관계 속 나의 마음'},{t:'상대', d:'상대의 마음'},{t:'관계', d:'둘 사이의 흐름'}]},
+  fork:   {name:'두 갈래 길', len:L3,
+           guide:'질문에 두 선택지가 적혀 있으면 첫 번째 길과 두 번째 길에 각각 맞춰 풀어요. 어느 쪽이 더 나아 보이는지 말할 수는 있지만, 결정은 질문한 사람에게 맡겨요.',
+           pos:[{t:'선택 A', d:'첫 번째 길을 고르면'},{t:'선택 B', d:'두 번째 길을 고르면'},{t:'조언', d:'고르기 전에 기억할 것'}]},
+  five:   {name:'파이브 카드', len:'3~4문단, 모두 합쳐 450~650자',
+           guide:'과거와 원인에서 시작해 현재, 미래, 가능성 순서로 이어 써요.',
+           pos:[{t:'현재', d:'지금 마주한 상황'},{t:'과거', d:'지금에 이르게 한 흐름'},{t:'미래', d:'이대로 갈 때의 방향'},{t:'원인', d:'문제의 뿌리'},{t:'가능성', d:'가장 좋게 풀릴 때의 모습'}]},
+  compat: {name:'궁합', len:L3,
+           guide:'두 사람이 서로를 떠올리며 한 장씩 고른 궁합 풀이예요. 두 사람을 이름으로 부르며, 각자 상대에게 품은 마음, 두 마음이 어떻게 만나는지, 둘이 함께 해 볼 일 하나를 써요. 점수를 매기거나 헤어짐·결혼 같은 결말을 단정하지 않아요.',
+           noQ:'질문 없음. 두 사람의 지금 마음과 어울림을 봐 주세요',
+           pos:[{t:'{A}의 마음', d:'{A이} {B를} 떠올리며 고른 것'},{t:'{B}의 마음', d:'{B이} {A를} 떠올리며 고른 것'}]}
 };
+
+// 받침에 맞춰 조사 붙이기: josa('민지','을','를') → '민지를'
+function josa(word, withFinal, noFinal) {
+  const ch = word.charCodeAt(word.length - 1);
+  if (ch >= 0xAC00 && ch <= 0xD7A3) return word + ((ch - 0xAC00) % 28 ? withFinal : noFinal);
+  return `${word}${withFinal}(${noFinal})`;
+}
+function fillNames(s, [A, B]) {
+  return s.replace(/\{A\}/g, A).replace(/\{B\}/g, B)
+          .replace(/\{A를\}/g, josa(A, '을', '를')).replace(/\{B를\}/g, josa(B, '을', '를'))
+          .replace(/\{A이\}/g, josa(A, '이', '가')).replace(/\{B이\}/g, josa(B, '이', '가'));
+}
 
 const SYSTEM = `당신은 타로 리더예요. 질문한 사람이 뽑은 카드의 뜻을 바탕으로, 그 사람의 상황에 대한 해석만 써요.
 
 절대 쓰지 않는 것:
 - 어떤 자리에 무엇이 나왔는지 알려 주는 말 (예: "과거의 자리에는 ○○가 놓였어요", "첫 번째 카드는")
 - '카드', '자리', '정방향', '역방향'이라는 낱말과 카드 이름
-- 그림, 사진, 별, 성운, 은하 같은 것에 빗댄 비유
+- 카드 그림이나 사진, 그 속 천체(성운, 은하, 성단, 달)를 끌어온 비유나 설명
 
 쓰는 방법:
-- 받은 흐름의 순서(예: 그동안 → 지금 → 앞으로, 또는 첫 번째 길 → 두 번째 길 → 기억할 것)를 "그동안", "지금은", "앞으로는", "이 길을 고르면" 같은 말로 자연스럽게 녹여, 하나의 이야기로 이어 써요.
+- 받은 흐름(예: 그동안 → 지금 → 앞으로, 첫 번째 길 → 두 번째 길, 두 사람의 마음)을 "그동안", "지금은", "앞으로는", "이 길을 고르면" 같은 말로 자연스럽게 녹여, 하나의 이야기로 이어 써요.
+- 요청에 '풀이 방식'이 있으면 그대로 따라요.
 - 질문이 있으면 그 질문에 직접 답해요. 질문에 나온 상황을 구체적으로 짚어요.
-- 2~3문단, 모두 합쳐 300~450자. 마지막 문장은 지금 할 수 있는 일 하나로 끝내요.
+- 분량은 요청의 '분량'을 지켜요. 마지막 문장은 지금 할 수 있는 일 하나로 끝내요.
 - 다정한 존댓말(~해요). 단정적인 예언이나 건강·법률·돈에 대한 판단은 하지 않아요.
 - 질문이 점과 관계없거나 위험한 내용이면, 풀이 대신 한두 문장으로 부드럽게 다른 질문을 권해요.
 - 마크다운 기호 없이 문단으로만 써요.
@@ -155,7 +186,10 @@ function validate(body) {
     cards.push({ n, rev: !!(c && c.rev) });
   }
   const question = String(body.question || '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, 140);
-  return { spread: body.spread, cards, question };
+  const nm = Array.isArray(body.names) ? body.names : [];
+  const clean = v => String(v || '').replace(/[^\p{L}\p{N} ]/gu, '').trim().slice(0, 10);
+  const names = [clean(nm[0]) || '첫 번째 사람', clean(nm[1]) || '두 번째 사람'];
+  return { spread: body.spread, cards, question, names };
 }
 
 function buildPrompt(v) {
@@ -165,11 +199,15 @@ function buildPrompt(v) {
   const lines = v.cards.map((pk, i) => {
     const c = CARDS[pk.n];
     const kw = (pk.rev ? c.rv : c.up).join(', ');
-    return `${i + 1}. [${sp.pos[i].t} · ${sp.pos[i].d}] 키워드: ${kw}. 뜻: ${pk.rev ? c.rvT : c.upT}`;
+    const t = fillNames(sp.pos[i].t, v.names), d = fillNames(sp.pos[i].d, v.names);
+    return `${i + 1}. [${t} · ${d}] 키워드: ${kw}. 뜻: ${pk.rev ? c.rvT : c.upT}`;
   }).join('\n');
-  return `질문: ${v.question ? `"${v.question}"` : '(질문 없음. 지금의 전반적인 흐름을 봐 주세요)'}
-흐름:
-${lines}`;
+  return [
+    `질문: ${v.question ? `"${v.question}"` : `(${sp.noQ || '질문 없음. 지금의 전반적인 흐름을 봐 주세요'})`}`,
+    sp.guide ? `풀이 방식: ${fillNames(sp.guide, v.names)}` : '',
+    `흐름:\n${lines}`,
+    `분량: ${sp.len}`
+  ].filter(Boolean).join('\n');
 }
 
 
