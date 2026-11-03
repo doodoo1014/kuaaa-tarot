@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": [
+    "iad1"
+  ],
+  "functions": {
+    "api/reading.mjs": {
+      "maxDuration": 30
+    }
+  }
+}

@@ -559,9 +559,9 @@ document.querySelectorAll('input[name="spread"]').forEach(r => r.addEventListene
 $('controls').addEventListener('submit', e => e.preventDefault());
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => layoutFan(false), 120); });
 
-/* ---- reading from the API (Cloudflare Worker) ---- */
-// Worker 주소를 넣으면 '풀이 듣기'가 켜져요. 비워 두면 카드별 뜻만 보여요.
-const API_URL = 'https://kuaaa-tarot.doodoo1014.workers.dev';
+/* ---- reading from the API (Vercel Function, api/reading.mjs) ---- */
+// Vercel 주소 뒤에 /api 를 붙여 넣으면 '풀이 듣기'가 켜져요. 비워 두면 카드별 뜻만 보여요.
+const API_URL = 'https://kuaaa-tarot.vercel.app/api';
 let ctl = null, lastKey = '', lastText = '';
 const oracleOut = $('oracleOut'), oracleMsg = $('oracleMsg');
 function clearOracle() {
