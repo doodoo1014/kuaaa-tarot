@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="고려대학교 아마추어 천문회 KUAAA가 찍은 성운과 은하로 보는 메이저 아르카나 타로">
-<meta property="og:title" content="당신의 운명을 선택하세요 · KUAAA 천체 타로">
-<meta property="og:description" content="KUAAA가 찍은 성운과 은하 22장으로 보는 메이저 아르카나 타로">
+<meta name="description" content="고려대학교 아마추어 천문회 KUAAA가 찍은 천체사진으로 보는 메이저 아르카나 타로">
+<meta property="og:title" content="별에 새겨진 운명">
+<meta property="og:description" content="KUAAA가 찍은 천체사진 22장으로 보는 메이저 아르카나 타로">
 <style>
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 body { margin: 0; }
@@ -67,7 +67,15 @@ h1 {
   grid-template-columns: 1fr; padding: 16px; border: 1px solid var(--line);
   border-radius: 14px; background: var(--felt);
 }
-.spreads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; border: 0; margin: 0; padding: 0; }
+.spreads { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; border: 0; margin: 0; padding: 0; }
+.themes { display: flex; flex-wrap: wrap; gap: 6px; border: 0; margin: 0; padding: 0; }
+.themes legend { font-family: var(--latin); font-size: 11px; letter-spacing: .18em; color: var(--gold-dim); margin-bottom: 6px; padding: 0; }
+.pill { position: relative; }
+.pill input { position: absolute; opacity: 0; inset: 0; }
+.pill label { display: inline-block; cursor: pointer; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--night); font-size: 14px; color: var(--mute); }
+.pill input:checked + label { border-color: var(--gold); color: var(--parch); box-shadow: inset 0 0 0 1px var(--gold); }
+.pill input:focus-visible + label { outline: 2px solid var(--gold); outline-offset: 2px; }
+.names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .spreads legend, .field-label { font-family: var(--latin); font-size: 11px; letter-spacing: .18em; color: var(--gold-dim); margin-bottom: 6px; padding: 0; }
 .spread-opt { position: relative; }
 .spread-opt input { position: absolute; opacity: 0; inset: 0; }
@@ -128,6 +136,15 @@ button { font: inherit; }
   width: 100%; aspect-ratio: var(--card-ratio); border-radius: 6% / 3.5%;
   border: 1px dashed #4b4152; background: transparent; padding: 0; perspective: 900px; cursor: default;
 }
+/* five-card cross: V above, II I III across, IV below */
+.slots.cross { display: grid; grid-template-columns: repeat(3, minmax(0, 128px)); grid-template-areas: ". s4 ." "s1 s0 s2" ". s3 ."; justify-content: center; gap: 12px 14px; }
+.slots.cross .slot { max-width: none; }
+.slots.cross .slot:nth-child(1) { grid-area: s0; }
+.slots.cross .slot:nth-child(2) { grid-area: s1; }
+.slots.cross .slot:nth-child(3) { grid-area: s2; }
+.slots.cross .slot:nth-child(4) { grid-area: s3; }
+.slots.cross .slot:nth-child(5) { grid-area: s4; }
+.slots.pair { gap: 18px; }
 .slot-card:not(.filled) .flip { visibility: hidden; }
 .slot-card:not(.filled)::before { content: attr(data-n); font-family: var(--latin); font-size: 22px; color: #5a4e5f; }
 .slot-card.filled { border: 0; cursor: pointer; }
@@ -210,9 +227,13 @@ footer strong { color: var(--parch); font-family: var(--display); }
 .latin { font-family: var(--latin); letter-spacing: .08em; }
 
 @media (max-width: 640px) {
-  .spread-opt label { padding: 9px 8px; text-align: center; place-content: center; }
-  .spread-opt strong { font-size: 14px; line-height: 1.35; }
-  .spread-opt span { display: none; }
+  .spreads { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .spread-opt label { padding: 9px 10px; }
+  .spread-opt strong { font-size: 14.5px; line-height: 1.35; }
+  .spread-opt span { font-size: 12px; }
+  .pill label { padding: 6px 11px; font-size: 13.5px; }
+  .slots.cross { gap: 10px 10px; }
+  .slots.cross .pos small { display: none; }
   .row2 { grid-template-columns: 1fr; }
   .toggles { justify-content: space-between; }
   .reading { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 14px; }
@@ -240,10 +261,28 @@ footer strong { color: var(--parch); font-family: var(--display); }
     <form class="controls" id="controls">
       <fieldset class="spreads">
         <legend>SPREAD</legend>
-        <div class="spread-opt"><input type="radio" name="spread" id="sp-today" value="today"><label for="sp-today"><strong>오늘의 카드</strong><span>한 장으로 오늘의 메시지</span></label></div>
-        <div class="spread-opt"><input type="radio" name="spread" id="sp-ppf" value="ppf" checked><label for="sp-ppf"><strong>과거 · 현재 · 미래</strong><span>세 장으로 보는 흐름</span></label></div>
-        <div class="spread-opt"><input type="radio" name="spread" id="sp-fork" value="fork"><label for="sp-fork"><strong>두 갈래 길</strong><span>두 선택지와 조언</span></label></div>
+        <div class="spread-opt"><input type="radio" name="kind" id="k-one" value="one"><label for="k-one"><strong>원 카드</strong><span>한 장으로 듣는 지금의 메시지</span></label></div>
+        <div class="spread-opt"><input type="radio" name="kind" id="k-three" value="three" checked><label for="k-three"><strong>쓰리 카드</strong><span>세 장으로 보는 흐름</span></label></div>
+        <div class="spread-opt"><input type="radio" name="kind" id="k-five" value="five"><label for="k-five"><strong>파이브 카드</strong><span>다섯 장 십자 펼침</span></label></div>
+        <div class="spread-opt"><input type="radio" name="kind" id="k-compat" value="compat"><label for="k-compat"><strong>궁합</strong><span>두 사람이 서로를 떠올리며 한 장씩</span></label></div>
       </fieldset>
+      <fieldset class="themes" id="themes">
+        <legend>THEME</legend>
+        <div class="pill"><input type="radio" name="theme" id="t-ppf" value="ppf" checked><label for="t-ppf">과거 · 현재 · 미래</label></div>
+        <div class="pill"><input type="radio" name="theme" id="t-sao" value="sao"><label for="t-sao">상황 · 장애 · 조언</label></div>
+        <div class="pill"><input type="radio" name="theme" id="t-rel" value="rel"><label for="t-rel">나 · 상대 · 관계</label></div>
+        <div class="pill"><input type="radio" name="theme" id="t-fork" value="fork"><label for="t-fork">두 갈래 길</label></div>
+      </fieldset>
+      <div class="names" id="names" hidden>
+        <div class="q">
+          <label class="field-label" for="nameA">FIRST <span style="letter-spacing:0">(이름, 선택)</span></label>
+          <input id="nameA" type="text" maxlength="10" placeholder="첫 번째 사람" autocomplete="off">
+        </div>
+        <div class="q">
+          <label class="field-label" for="nameB">SECOND <span style="letter-spacing:0">(이름, 선택)</span></label>
+          <input id="nameB" type="text" maxlength="10" placeholder="두 번째 사람" autocomplete="off">
+        </div>
+      </div>
       <div class="row2">
         <div class="q">
           <label class="field-label" for="question">QUESTION <span style="letter-spacing:0">(선택)</span></label>
@@ -393,14 +432,49 @@ const CARDS = [
    rv:['미완성','마무리 부족','지연'], rvT:'거의 다 왔지만 마지막 한 조각이 남아 있어요. 끝맺음을 미루지 말고 마무리하세요.',
    sky:'둥근 장미 모양 성운이 세계 카드 속 인물을 감싼 월계관을 닮았어요. 한가운데 젊은 별무리가 안쪽을 비워 둥근 꽃 모양을 만들었어요.'}
 ];
+// 펼침마다 자리 이름(t)과 뜻(d). api/reading.mjs의 SPREADS와 키·장수가 같아야 해요.
+// 궁합의 {A} {B}는 입력한 이름으로 바뀌어요. {A이}처럼 쓰면 받침에 맞춰 이/가를 붙여요.
 const SPREADS = {
-  today: {name:'오늘의 카드', pos:[{t:'오늘의 메시지', d:'오늘 하루 마음에 둘 이야기'}]},
-  ppf:   {name:'과거 · 현재 · 미래', pos:[{t:'과거', d:'지금에 이르게 한 흐름'},{t:'현재', d:'지금 마주한 상황'},{t:'미래', d:'이대로 갈 때의 방향'}]},
-  fork:  {name:'두 갈래 길', pos:[{t:'선택 A', d:'첫 번째 길을 고르면'},{t:'선택 B', d:'두 번째 길을 고르면'},{t:'조언', d:'고르기 전에 기억할 것'}]}
+  one:    {name:'원 카드', q:'예: 오늘 무엇에 마음을 쓰면 좋을까?',
+           pos:[{t:'메시지', d:'지금 마음에 둘 이야기'}]},
+  ppf:    {name:'과거 · 현재 · 미래', q:'예: 이번 학기 관측 계획, 어떻게 세우면 좋을까?',
+           pos:[{t:'과거', d:'지금에 이르게 한 흐름'},{t:'현재', d:'지금 마주한 상황'},{t:'미래', d:'이대로 갈 때의 방향'}]},
+  sao:    {name:'상황 · 장애 · 조언', q:'예: 동아리 일이 자꾸 꼬여요. 어떻게 풀까?',
+           pos:[{t:'상황', d:'지금 놓인 자리'},{t:'장애', d:'앞을 가로막는 것'},{t:'조언', d:'풀어 갈 실마리'}]},
+  rel:    {name:'나 · 상대 · 관계', q:'예: 요즘 서먹해진 친구와의 사이',
+           pos:[{t:'나', d:'이 관계 속 나의 마음'},{t:'상대', d:'상대의 마음'},{t:'관계', d:'둘 사이의 흐름'}]},
+  fork:   {name:'두 갈래 길', q:'예: A는 대학원, B는 취업',
+           pos:[{t:'선택 A', d:'첫 번째 길을 고르면'},{t:'선택 B', d:'두 번째 길을 고르면'},{t:'조언', d:'고르기 전에 기억할 것'}]},
+  five:   {name:'파이브 카드', q:'예: 이번 프로젝트, 어떻게 흘러갈까?',
+           pos:[{t:'현재', d:'지금 마주한 상황'},{t:'과거', d:'지금에 이르게 한 흐름'},{t:'미래', d:'이대로 갈 때의 방향'},{t:'원인', d:'문제의 뿌리'},{t:'가능성', d:'가장 좋게 풀릴 때의 모습'}]},
+  compat: {name:'궁합', q:'예: 우리, 이번 겨울 잘 지낼 수 있을까?',
+           pos:[{t:'{A}의 마음', d:'{B를} 떠올리며 고른 카드'},{t:'{B}의 마음', d:'{A를} 떠올리며 고른 카드'}]}
 };
+const NUMERALS = ['I','II','III','IV','V'];
 const img = n => `cards/${String(n).padStart(2,'0')}.jpg`;
 const $ = id => document.getElementById(id);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+// 받침에 맞춰 조사 붙이기: josa('민지','을','를') → '민지를'
+function josa(word, withFinal, noFinal) {
+  const ch = word.charCodeAt(word.length - 1);
+  if (ch >= 0xAC00 && ch <= 0xD7A3) return word + ((ch - 0xAC00) % 28 ? withFinal : noFinal);
+  return `${word}${withFinal}(${noFinal})`;
+}
+function names() {
+  const clean = v => v.replace(/[^\p{L}\p{N} ]/gu, '').trim().slice(0, 10);
+  return [clean($('nameA').value) || '첫 번째 사람', clean($('nameB').value) || '두 번째 사람'];
+}
+function fill(s, [A, B]) {
+  return s.replace(/\{A\}/g, A).replace(/\{B\}/g, B)
+          .replace(/\{A를\}/g, josa(A, '을', '를')).replace(/\{B를\}/g, josa(B, '을', '를'))
+          .replace(/\{A이\}/g, josa(A, '이', '가')).replace(/\{B이\}/g, josa(B, '이', '가'));
+}
+function positions() {
+  const nm = names();
+  return SPREADS[state.spread].pos.map(p => ({ t: fill(p.t, nm), d: fill(p.d, nm) }));
+}
 
 const fan = $('fan'), slotsEl = $('slots'), readingsEl = $('readings'), statusEl = $('status');
 let state = { spread:'ppf', deck:[], picks:[], open:[] };
@@ -452,24 +526,48 @@ function layoutFan(stacked) {
 }
 
 function buildSlots() {
-  const sp = SPREADS[state.spread];
+  const pos = positions();
   slotsEl.innerHTML = '';
-  sp.pos.forEach((pos, i) => {
+  slotsEl.className = 'slots' + (state.spread === 'five' ? ' cross' : state.spread === 'compat' ? ' pair' : '');
+  pos.forEach((p, i) => {
     const s = document.createElement('div');
     s.className = 'slot';
-    s.innerHTML = `<button type="button" class="slot-card" id="slot${i}" data-n="${['I','II','III'][i]}" aria-label="${pos.t} 자리, 아직 카드 없음" disabled>
+    s.innerHTML = `<button type="button" class="slot-card" id="slot${i}" data-n="${NUMERALS[i]}" aria-label="${esc(p.t)} 자리, 아직 카드 없음" disabled>
         <div class="flip"><div class="face back"><img src="cards/back.jpg" alt=""></div><div class="face front"><img alt=""></div></div>
-      </button><div class="pos">${pos.t}<small>${pos.d}</small></div>`;
+      </button><div class="pos"><span class="pos-t">${esc(p.t)}</span><small>${esc(p.d)}</small></div>`;
     slotsEl.appendChild(s);
     s.querySelector('.slot-card').addEventListener('click', () => openSlot(i));
   });
+}
+
+// 이름을 바꾸면 자리 이름만 다시 써요 (뽑은 카드는 그대로)
+function relabel() {
+  const pos = positions();
+  slotsEl.querySelectorAll('.slot').forEach((s, i) => {
+    s.querySelector('.pos-t').textContent = pos[i].t;
+    s.querySelector('.pos small').textContent = pos[i].d;
+    const card = s.querySelector('.slot-card'), pk = state.picks[i];
+    card.setAttribute('aria-label', state.open[i] ? `${pos[i].t}: ${CARDS[pk.n].ko}${pk.rev ? ' 역방향' : ''}`
+      : pk ? `${pos[i].t} 자리 카드 뒤집기` : `${pos[i].t} 자리, 아직 카드 없음`);
+  });
+  renderReadings();
+  setStatus();
+}
+
+function pickHint(got) {
+  if (state.spread === 'compat') {
+    const [A, B] = names();
+    return got === 0 ? `${josa(A, '이', '가')} ${josa(B, '을', '를')} 떠올리며 끌리는 카드를 누르세요.`
+                     : `이제 ${josa(B, '이', '가')} ${josa(A, '을', '를')} 떠올리며 고를 차례예요.`;
+  }
+  return got === 0 ? '마음속 질문을 떠올리며 끌리는 카드를 누르세요.' : `다음은 ‘${positions()[got].t}’ 자리예요.`;
 }
 
 function setStatus() {
   const sp = SPREADS[state.spread], need = sp.pos.length, got = state.picks.length;
   const opened = state.open.filter(Boolean).length;
   if (got < need) {
-    statusEl.innerHTML = `카드를 ${need}장 고르세요 <span class="latin">${got} / ${need}</span><small>${got === 0 ? '마음속 질문을 떠올리며 끌리는 카드를 누르세요.' : `다음은 ‘${sp.pos[got].t}’ 자리예요.`}</small>`;
+    statusEl.innerHTML = `카드를 ${need}장 고르세요 <span class="latin">${got} / ${need}</span><small>${esc(pickHint(got))}</small>`;
   } else if (opened < need) {
     statusEl.innerHTML = `카드를 뒤집어 보세요<small>아래 카드를 하나씩 누르거나 모두 뒤집기를 누르세요.</small>`;
   } else {
@@ -503,7 +601,7 @@ function pick(p) {
   state.picks.push(state.deck[p]);
   const slot = $('slot' + i);
   slot.classList.add('filled'); slot.disabled = false;
-  slot.setAttribute('aria-label', `${SPREADS[state.spread].pos[i].t} 자리 카드 뒤집기`);
+  slot.setAttribute('aria-label', `${positions()[i].t} 자리 카드 뒤집기`);
   setStatus();
   if (state.picks.length === need) fanEls.forEach(el => { if (!el.classList.contains('taken')) el.disabled = true; });
 }
@@ -518,7 +616,7 @@ function openSlot(i) {
   const im = front.querySelector('img');
   im.src = img(pk.n); im.alt = `${c.ko} 카드 (${c.obj})${pk.rev ? ', 역방향' : ''}`;
   slot.classList.add('open');
-  slot.setAttribute('aria-label', `${SPREADS[state.spread].pos[i].t}: ${c.ko}${pk.rev ? ' 역방향' : ''}`);
+  slot.setAttribute('aria-label', `${positions()[i].t}: ${c.ko}${pk.rev ? ' 역방향' : ''}`);
   state.open[i] = true;
   renderReadings();
   setStatus();
@@ -531,14 +629,14 @@ function skyBlock(c) {
 }
 
 function renderReadings() {
-  const sp = SPREADS[state.spread];
+  const pos = positions();
   readingsEl.innerHTML = state.picks.map((pk, i) => {
     if (!state.open[i]) return '';
     const c = CARDS[pk.n];
     return `<article class="reading">
       <img class="thumb${pk.rev ? ' rev' : ''}" src="${img(pk.n)}" alt="">
       <div>
-        <div class="r-pos">${String(i + 1).padStart(2, '0')} · <b>${sp.pos[i].t}</b> — <span style="letter-spacing:0;font-family:var(--body)">${sp.pos[i].d}</span></div>
+        <div class="r-pos">${String(i + 1).padStart(2, '0')} · <b>${esc(pos[i].t)}</b> — <span style="letter-spacing:0;font-family:var(--body)">${esc(pos[i].d)}</span></div>
         <h3><span class="r-num">${c.r}</span>${c.ko}<span class="r-en">${c.en}</span><span class="tag ${pk.rev ? 'rv' : 'up'}">${pk.rev ? '역방향' : '정방향'}</span></h3>
         ${chips(pk.rev ? c.rv : c.up)}
         <p>${pk.rev ? c.rvT : c.upT}</p>
@@ -553,9 +651,18 @@ $('revealAll').addEventListener('click', () => {
 });
 $('shuffle').addEventListener('click', () => reset(true));
 $('reversals').addEventListener('change', () => reset(true));
-document.querySelectorAll('input[name="spread"]').forEach(r => r.addEventListener('change', e => {
-  state.spread = e.target.value; reset(true);
+function chooseSpread() {
+  const kind = document.querySelector('input[name="kind"]:checked').value;
+  const theme = document.querySelector('input[name="theme"]:checked').value;
+  state.spread = kind === 'three' ? theme : kind;
+  $('themes').hidden = kind !== 'three';
+  $('names').hidden = kind !== 'compat';
+  $('question').placeholder = SPREADS[state.spread].q;
+}
+document.querySelectorAll('input[name="kind"], input[name="theme"]').forEach(r => r.addEventListener('change', () => {
+  chooseSpread(); reset(true);
 }));
+['nameA', 'nameB'].forEach(id => $(id).addEventListener('input', relabel));
 $('controls').addEventListener('submit', e => e.preventDefault());
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => layoutFan(false), 120); });
 
@@ -575,7 +682,7 @@ function paras(text) {
     const p = document.createElement('p'); p.textContent = t; oracleOut.appendChild(p);
   });
 }
-const drawKey = () => JSON.stringify([state.spread, $('question').value.trim(), state.picks]);
+const drawKey = () => JSON.stringify([state.spread, $('question').value.trim(), state.picks, state.spread === 'compat' ? names() : 0]);
 const ERRMSG = {
   429: '지금 풀이를 보는 사람이 많아요. 잠시 뒤에 다시 눌러 주세요.',
   403: '이 주소에서는 풀이를 불러올 수 없어요.'
@@ -595,7 +702,8 @@ $('askClaude').addEventListener('click', async () => {
       body: JSON.stringify({
         spread: state.spread,
         question: $('question').value.trim(),
-        cards: state.picks.map(p => ({ n: p.n, rev: !!p.rev }))
+        cards: state.picks.map(p => ({ n: p.n, rev: !!p.rev })),
+        ...(state.spread === 'compat' ? { names: names() } : {})
       }),
       signal: ctl.signal
     });
@@ -653,6 +761,7 @@ $('mClose').addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
 
+chooseSpread();
 reset(false);
 </script>
 </body>
