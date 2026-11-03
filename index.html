@@ -561,7 +561,7 @@ let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() 
 
 /* ---- reading from the API (Cloudflare Worker) ---- */
 // Worker 주소를 넣으면 '풀이 듣기'가 켜져요. 비워 두면 카드별 뜻만 보여요.
-const API_URL = '';   // 예: 'https://kuaaa-tarot.내계정.workers.dev'
+const API_URL = 'https://kuaaa-tarot.doodoo1014.workers.dev';
 let ctl = null, lastKey = '', lastText = '';
 const oracleOut = $('oracleOut'), oracleMsg = $('oracleMsg');
 function clearOracle() {
