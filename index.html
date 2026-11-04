@@ -3,19 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="고려대학교 아마추어 천문회 KUAAA가 찍은 천체사진으로 보는 메이저 아르카나 타로">
-<meta property="og:title" content="별에 새겨진 운명">
-<meta property="og:description" content="KUAAA가 찍은 천체사진 22장으로 보는 메이저 아르카나 타로">
+<meta name="description" content="KUAAA 천체사진전 「星運: 별에 새겨진 운명」 · 고려대학교 아마추어 천문회가 직접 찍은 천체사진으로 만든 메이저 아르카나 타로">
+<meta property="og:title" content="星運: 별에 새겨진 운명 · KUAAA 천체 타로">
+<meta property="og:description" content="KUAAA가 직접 찍은 천체사진으로 만든 메이저 아르카나 22장">
 <style>
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 body { margin: 0; }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
 </style>
-<title>KUAAA 천체 타로</title>
+<title>星運: 별에 새겨진 운명 · KUAAA 천체 타로</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@700;800&display=swap">
+<!-- 제목 한자 星運 두 글자만 받아요 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700&text=%E6%98%9F%E9%81%8B&display=swap">
 <style>
 /* Layout: a night reading table. Title, then the fanned deck you pick from,
    the drawn cards, their readings, and a catalogue of all 22 cards. */
@@ -56,9 +58,18 @@ body {
 .eyebrow { font-family: var(--latin); font-weight: 600; letter-spacing: .22em; font-size: 12px; color: var(--gold); }
 h1 {
   font-family: var(--display); font-weight: 800; margin: 0;
-  font-size: clamp(30px, 6.4vw, 54px); line-height: 1.2; letter-spacing: -.01em;
-  text-wrap: balance; color: var(--parch);
+  display: grid; gap: 12px; justify-items: center; color: var(--parch);
 }
+/* 星運: the exhibition title, set large; the subtitle sits under it in gold */
+.han {
+  font-family: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", serif; font-weight: 700;
+  font-size: clamp(64px, 17vw, 120px); line-height: 1; letter-spacing: .1em; padding-left: .1em;
+  text-shadow: 0 0 32px rgba(201, 160, 106, .28);
+}
+.han-sub { font-size: clamp(20px, 4.8vw, 30px); line-height: 1.3; letter-spacing: .04em; color: var(--gold); }
+.han-inline { font-family: "Noto Serif KR", "Nanum Myeongjo", serif; }
+.kicker { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(14px, 3.6vw, 16px); letter-spacing: .06em; color: var(--gold); }
+.kicker .latin { font-family: var(--latin); font-weight: 700; letter-spacing: .1em; }
 .lede { margin: 0; max-width: 34em; color: var(--mute); }
 
 /* ---- controls ---- */
@@ -75,16 +86,16 @@ h1 {
 .pill label { display: inline-block; cursor: pointer; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--night); font-size: 14px; color: var(--mute); }
 .pill input:checked + label { border-color: var(--gold); color: var(--parch); box-shadow: inset 0 0 0 1px var(--gold); }
 .pill input:focus-visible + label { outline: 2px solid var(--gold); outline-offset: 2px; }
+.topic-custom { flex-basis: 100%; margin-top: 4px; }
 .names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .spreads legend, .field-label { font-family: var(--latin); font-size: 11px; letter-spacing: .18em; color: var(--gold-dim); margin-bottom: 6px; padding: 0; }
 .spread-opt { position: relative; }
 .spread-opt input { position: absolute; opacity: 0; inset: 0; }
 .spread-opt label {
-  display: grid; gap: 2px; height: 100%; cursor: pointer; padding: 10px 12px;
+  display: grid; place-items: center; text-align: center; height: 100%; cursor: pointer; padding: 12px;
   border: 1px solid var(--line); border-radius: 10px; background: var(--night);
 }
 .spread-opt strong { font-family: var(--display); font-weight: 700; font-size: 15px; }
-.spread-opt span { font-size: 12.5px; color: var(--mute); line-height: 1.45; }
 .spread-opt input:checked + label { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
 .spread-opt input:focus-visible + label { outline: 2px solid var(--gold); outline-offset: 2px; }
 .row2 { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
@@ -228,14 +239,13 @@ footer strong { color: var(--parch); font-family: var(--display); }
 
 @media (max-width: 640px) {
   .spreads { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .spread-opt label { padding: 9px 10px; }
+  .spread-opt label { padding: 11px 10px; }
   .spread-opt strong { font-size: 14.5px; line-height: 1.35; }
-  .spread-opt span { font-size: 12px; }
   .pill label { padding: 6px 11px; font-size: 13.5px; }
   .slots.cross { gap: 10px 10px; }
   .slots.cross .pos small { display: none; }
   .row2 { grid-template-columns: 1fr; }
-  .toggles { justify-content: space-between; }
+  .toggles { justify-content: flex-end; }
   .reading { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 14px; }
   .reading .thumb { width: 64px; }
   .sheet { grid-template-columns: 1fr; }
@@ -252,26 +262,32 @@ footer strong { color: var(--parch); font-family: var(--display); }
 
 <div class="wrap">
   <header class="masthead">
-    <div class="eyebrow">KUAAA · CELESTIAL TAROT</div>
-    <h1>당신의 운명을 선택하세요</h1>
-    <p class="lede">고려대학교 아마추어 천문회가 직접 찍은 성운과 은하, 그리고 달로 만든 메이저 아르카나 22장이에요. 마음속 질문을 떠올리고, 펼쳐진 카드에서 끌리는 카드를 고르세요.</p>
+    <p class="kicker"><span class="latin">2026 KUAAA</span> 제41회 천체사진전</p>
+    <h1 aria-label="성운, 별에 새겨진 운명"><span class="han">星運</span><span class="han-sub">별에 새겨진 운명</span></h1>
+    <p class="lede">고려대학교 아마추어 천문회가 직접 찍은 천체사진으로 만든 메이저 아르카나 22장이에요. 마음속 질문을 떠올리고, 펼쳐진 카드에서 끌리는 카드를 고르세요.</p>
   </header>
 
   <section id="reading" aria-label="타로 점 보기">
     <form class="controls" id="controls">
       <fieldset class="spreads">
         <legend>SPREAD</legend>
-        <div class="spread-opt"><input type="radio" name="kind" id="k-one" value="one"><label for="k-one"><strong>원 카드</strong><span>한 장으로 듣는 지금의 메시지</span></label></div>
-        <div class="spread-opt"><input type="radio" name="kind" id="k-three" value="three" checked><label for="k-three"><strong>쓰리 카드</strong><span>세 장으로 보는 흐름</span></label></div>
-        <div class="spread-opt"><input type="radio" name="kind" id="k-five" value="five"><label for="k-five"><strong>파이브 카드</strong><span>다섯 장 십자 펼침</span></label></div>
-        <div class="spread-opt"><input type="radio" name="kind" id="k-compat" value="compat"><label for="k-compat"><strong>궁합</strong><span>두 사람이 서로를 떠올리며 한 장씩</span></label></div>
+        <div class="spread-opt"><input type="radio" name="kind" id="k-one" value="one"><label for="k-one"><strong>원 카드</strong></label></div>
+        <div class="spread-opt"><input type="radio" name="kind" id="k-three" value="three" checked><label for="k-three"><strong>쓰리 카드</strong></label></div>
+        <div class="spread-opt"><input type="radio" name="kind" id="k-five" value="five"><label for="k-five"><strong>파이브 카드</strong></label></div>
+        <div class="spread-opt"><input type="radio" name="kind" id="k-compat" value="compat"><label for="k-compat"><strong>궁합</strong></label></div>
       </fieldset>
-      <fieldset class="themes" id="themes">
-        <legend>THEME</legend>
-        <div class="pill"><input type="radio" name="theme" id="t-ppf" value="ppf" checked><label for="t-ppf">과거 · 현재 · 미래</label></div>
-        <div class="pill"><input type="radio" name="theme" id="t-sao" value="sao"><label for="t-sao">상황 · 장애 · 조언</label></div>
-        <div class="pill"><input type="radio" name="theme" id="t-rel" value="rel"><label for="t-rel">나 · 상대 · 관계</label></div>
-        <div class="pill"><input type="radio" name="theme" id="t-fork" value="fork"><label for="t-fork">두 갈래 길</label></div>
+      <fieldset class="themes" id="topics">
+        <legend>TOPIC</legend>
+        <div class="pill"><input type="radio" name="topic" id="t-total" value="total" checked><label for="t-total">총운</label></div>
+        <div class="pill"><input type="radio" name="topic" id="t-love" value="love"><label for="t-love">연애운</label></div>
+        <div class="pill"><input type="radio" name="topic" id="t-study" value="study"><label for="t-study">학업운</label></div>
+        <div class="pill"><input type="radio" name="topic" id="t-career" value="career"><label for="t-career">진로운</label></div>
+        <div class="pill"><input type="radio" name="topic" id="t-money" value="money"><label for="t-money">금전운</label></div>
+        <div class="pill"><input type="radio" name="topic" id="t-people" value="people"><label for="t-people">인간관계운</label></div>
+        <div class="pill"><input type="radio" name="topic" id="t-custom" value="custom"><label for="t-custom">기타</label></div>
+        <div class="q topic-custom" id="customWrap" hidden>
+          <input id="topicText" type="text" maxlength="10" placeholder="보고 싶은 운을 적어 주세요 (예: 건강운, 여행운)" autocomplete="off" aria-label="직접 적는 주제">
+        </div>
       </fieldset>
       <div class="names" id="names" hidden>
         <div class="q">
@@ -289,7 +305,6 @@ footer strong { color: var(--parch); font-family: var(--display); }
           <input id="question" type="text" maxlength="140" placeholder="예: 이번 학기 관측 계획, 어떻게 세우면 좋을까?" autocomplete="off">
         </div>
         <div class="toggles">
-          <label class="switch" for="reversals"><input type="checkbox" id="reversals" checked> 역방향 포함</label>
           <button type="button" class="btn" id="shuffle">다시 섞기</button>
         </div>
       </div>
@@ -318,15 +333,14 @@ footer strong { color: var(--parch); font-family: var(--display); }
 
   <section class="catalogue" id="deck">
     <h2>22장의 카드와 천체</h2>
-    <p>카드마다 왜 그 천체를 골랐는지 담았어요. 카드를 누르면 자세한 뜻을 볼 수 있어요.</p>
+    <p>카드를 누르면 자세한 뜻을 볼 수 있어요.</p>
     <div class="grid" id="grid"></div>
   </section>
 
   <footer>
-    <strong>KUAAA 천체사진전 「당신의 운명을 선택하세요」</strong>
-    <span><span class="latin">2026. 11. 28 – 29</span> · 오전 10시 – 오후 6시 · 고려대학교 하나스퀘어 지하 전시실</span>
+    <strong>KUAAA 제41회 천체사진전 「<span class="han-inline">星運</span>: 별에 새겨진 운명」</strong>
+    <span><span class="latin">2026. 11. 27</span> (금) – <span class="latin">28</span> (토) · 오전 10시 – 오후 6시 · 고려대학교 하나스퀘어 지하 전시실</span>
     <span>주최 고려대학교 아마추어 천문회 <span class="latin">KUAAA</span></span>
-    <span>카드 틀에 맞추느라 일부 사진은 가장자리 배경을 이어 그렸어요. 타로 풀이는 재미와 성찰을 위한 것이에요.</span>
   </footer>
 </div>
 
@@ -435,21 +449,28 @@ const CARDS = [
 // 펼침마다 자리 이름(t)과 뜻(d). api/reading.mjs의 SPREADS와 키·장수가 같아야 해요.
 // 궁합의 {A} {B}는 입력한 이름으로 바뀌어요. {A이}처럼 쓰면 받침에 맞춰 이/가를 붙여요.
 const SPREADS = {
-  one:    {name:'원 카드', q:'예: 오늘 무엇에 마음을 쓰면 좋을까?',
+  one:    {name:'원 카드',
            pos:[{t:'메시지', d:'지금 마음에 둘 이야기'}]},
-  ppf:    {name:'과거 · 현재 · 미래', q:'예: 이번 학기 관측 계획, 어떻게 세우면 좋을까?',
-           pos:[{t:'과거', d:'지금에 이르게 한 흐름'},{t:'현재', d:'지금 마주한 상황'},{t:'미래', d:'이대로 갈 때의 방향'}]},
-  sao:    {name:'상황 · 장애 · 조언', q:'예: 동아리 일이 자꾸 꼬여요. 어떻게 풀까?',
-           pos:[{t:'상황', d:'지금 놓인 자리'},{t:'장애', d:'앞을 가로막는 것'},{t:'조언', d:'풀어 갈 실마리'}]},
-  rel:    {name:'나 · 상대 · 관계', q:'예: 요즘 서먹해진 친구와의 사이',
-           pos:[{t:'나', d:'이 관계 속 나의 마음'},{t:'상대', d:'상대의 마음'},{t:'관계', d:'둘 사이의 흐름'}]},
-  fork:   {name:'두 갈래 길', q:'예: A는 대학원, B는 취업',
-           pos:[{t:'선택 A', d:'첫 번째 길을 고르면'},{t:'선택 B', d:'두 번째 길을 고르면'},{t:'조언', d:'고르기 전에 기억할 것'}]},
-  five:   {name:'파이브 카드', q:'예: 이번 프로젝트, 어떻게 흘러갈까?',
+  // 쓰리 카드의 자리 틀(과거·현재·미래, 상황·장애·조언 등)은 서버가 질문을 보고 정해요. 화면에는 순서만 보여요.
+  three:  {name:'쓰리 카드',
+           pos:[{t:'첫 번째 카드', d:''},{t:'두 번째 카드', d:''},{t:'세 번째 카드', d:''}]},
+  five:   {name:'파이브 카드',
            pos:[{t:'현재', d:'지금 마주한 상황'},{t:'과거', d:'지금에 이르게 한 흐름'},{t:'미래', d:'이대로 갈 때의 방향'},{t:'원인', d:'문제의 뿌리'},{t:'가능성', d:'가장 좋게 풀릴 때의 모습'}]},
   compat: {name:'궁합', q:'예: 우리, 이번 겨울 잘 지낼 수 있을까?',
            pos:[{t:'{A}의 마음', d:'{B를} 떠올리며 고른 카드'},{t:'{B}의 마음', d:'{A를} 떠올리며 고른 카드'}]}
 };
+// 운세 주제. api/reading.mjs의 TOPICS와 키가 같아야 해요. 궁합에는 쓰지 않아요.
+const TOPICS = {
+  total:  {name:'총운',       q:'예: 요즘 나에게 필요한 건 뭘까?'},
+  love:   {name:'연애운',     q:'예: 그 사람에게 고백해도 될까?'},
+  study:  {name:'학업운',     q:'예: 이번 기말고사, 어떻게 준비할까?'},
+  career: {name:'진로운',     q:'예: 대학원과 취업 사이에서 고민돼요'},
+  money:  {name:'금전운',     q:'예: 이번 달 씀씀이, 괜찮을까?'},
+  people: {name:'인간관계운', q:'예: 서먹해진 친구와 다시 가까워질 수 있을까?'},
+  custom: {name:'기타',       q:'예: 이번 달 흐름은 어떨까?'}   // 주제를 직접 적어요
+};
+const cleanText = v => v.replace(/[^\p{L}\p{N} ]/gu, '').trim().slice(0, 10);
+const topicName = () => state.topic === 'custom' ? (cleanText($('topicText').value) || '기타') : TOPICS[state.topic].name;
 const NUMERALS = ['I','II','III','IV','V'];
 const img = n => `cards/${String(n).padStart(2,'0')}.jpg`;
 const $ = id => document.getElementById(id);
@@ -477,7 +498,8 @@ function positions() {
 }
 
 const fan = $('fan'), slotsEl = $('slots'), readingsEl = $('readings'), statusEl = $('status');
-let state = { spread:'ppf', deck:[], picks:[], open:[] };
+let state = { spread:'three', topic:'total', deck:[], picks:[], open:[] };
+const readingName = () => SPREADS[state.spread].name + (state.spread === 'compat' ? '' : ` · ${topicName()}`);
 let fanEls = [];
 
 function shuffledDeck(withRev) {
@@ -535,6 +557,7 @@ function buildSlots() {
     s.innerHTML = `<button type="button" class="slot-card" id="slot${i}" data-n="${NUMERALS[i]}" aria-label="${esc(p.t)} 자리, 아직 카드 없음" disabled>
         <div class="flip"><div class="face back"><img src="cards/back.jpg" alt=""></div><div class="face front"><img alt=""></div></div>
       </button><div class="pos"><span class="pos-t">${esc(p.t)}</span><small>${esc(p.d)}</small></div>`;
+    if (!p.d) s.querySelector('.pos small').hidden = true;
     slotsEl.appendChild(s);
     s.querySelector('.slot-card').addEventListener('click', () => openSlot(i));
   });
@@ -560,7 +583,7 @@ function pickHint(got) {
     return got === 0 ? `${josa(A, '이', '가')} ${josa(B, '을', '를')} 떠올리며 끌리는 카드를 누르세요.`
                      : `이제 ${josa(B, '이', '가')} ${josa(A, '을', '를')} 떠올리며 고를 차례예요.`;
   }
-  return got === 0 ? '마음속 질문을 떠올리며 끌리는 카드를 누르세요.' : `다음은 ‘${positions()[got].t}’ 자리예요.`;
+  return '마음속 질문을 떠올리며 끌리는 카드를 누르세요.';   // 몇 번째·어느 자리인지는 알려 주지 않아요
 }
 
 function setStatus() {
@@ -571,7 +594,7 @@ function setStatus() {
   } else if (opened < need) {
     statusEl.innerHTML = `카드를 뒤집어 보세요<small>아래 카드를 하나씩 누르거나 모두 뒤집기를 누르세요.</small>`;
   } else {
-    statusEl.innerHTML = `${sp.name} 풀이<small>다시 보려면 ‘다시 섞기’를 누르세요.</small>`;
+    statusEl.innerHTML = `${esc(readingName())} 풀이<small>다시 보려면 ‘다시 섞기’를 누르세요.</small>`;
   }
   $('revealAll').disabled = !(got === need && opened < need);
   $('revealAll').hidden = opened === need;
@@ -579,7 +602,7 @@ function setStatus() {
 }
 
 function reset(animate) {
-  state.deck = shuffledDeck($('reversals').checked);
+  state.deck = shuffledDeck(true);   // 정방향·역방향이 늘 섞여 나와요
   state.picks = []; state.open = [];
   readingsEl.innerHTML = '';
   $('oracle').hidden = true; clearOracle();
@@ -625,7 +648,7 @@ function openSlot(i) {
 
 function chips(list) { return `<ul class="chips">${list.map(k => `<li>${k}</li>`).join('')}</ul>`; }
 function skyBlock(c) {
-  return `<div class="sky"><div class="sky-head"><span class="sky-label">이 카드의 천체</span><strong>${c.obj}</strong><span class="cat">${c.cat} · ${c.con}</span>${c.photo ? '' : '<span class="pending">카드 사진 준비 중</span>'}</div>${c.sky}</div>`;
+  return `<div class="sky"><div class="sky-head"><span class="sky-label">이 카드의 천체</span><strong>${c.obj}</strong><span class="cat">${c.cat} · ${c.con}</span>${c.photo ? '' : '<span class="pending">카드 사진 준비 중</span>'}</div></div>`;
 }
 
 function renderReadings() {
@@ -636,7 +659,7 @@ function renderReadings() {
     return `<article class="reading">
       <img class="thumb${pk.rev ? ' rev' : ''}" src="${img(pk.n)}" alt="">
       <div>
-        <div class="r-pos">${String(i + 1).padStart(2, '0')} · <b>${esc(pos[i].t)}</b> — <span style="letter-spacing:0;font-family:var(--body)">${esc(pos[i].d)}</span></div>
+        <div class="r-pos">${String(i + 1).padStart(2, '0')} · <b>${esc(pos[i].t)}</b>${pos[i].d ? ` — <span style="letter-spacing:0;font-family:var(--body)">${esc(pos[i].d)}</span>` : ''}</div>
         <h3><span class="r-num">${c.r}</span>${c.ko}<span class="r-en">${c.en}</span><span class="tag ${pk.rev ? 'rv' : 'up'}">${pk.rev ? '역방향' : '정방향'}</span></h3>
         ${chips(pk.rev ? c.rv : c.up)}
         <p>${pk.rev ? c.rvT : c.upT}</p>
@@ -650,19 +673,25 @@ $('revealAll').addEventListener('click', () => {
   state.picks.forEach((_, i) => setTimeout(() => openSlot(i), reduceMotion ? 0 : i * 260));
 });
 $('shuffle').addEventListener('click', () => reset(true));
-$('reversals').addEventListener('change', () => reset(true));
 function chooseSpread() {
-  const kind = document.querySelector('input[name="kind"]:checked').value;
-  const theme = document.querySelector('input[name="theme"]:checked').value;
-  state.spread = kind === 'three' ? theme : kind;
-  $('themes').hidden = kind !== 'three';
-  $('names').hidden = kind !== 'compat';
-  $('question').placeholder = SPREADS[state.spread].q;
+  state.spread = document.querySelector('input[name="kind"]:checked').value;
+  state.topic = document.querySelector('input[name="topic"]:checked').value;
+  const compat = state.spread === 'compat';
+  $('topics').hidden = compat;
+  $('customWrap').hidden = state.topic !== 'custom';
+  $('names').hidden = !compat;
+  $('question').placeholder = compat ? SPREADS.compat.q : TOPICS[state.topic].q;
 }
-document.querySelectorAll('input[name="kind"], input[name="theme"]').forEach(r => r.addEventListener('change', () => {
+document.querySelectorAll('input[name="kind"]').forEach(r => r.addEventListener('change', () => {
   chooseSpread(); reset(true);
 }));
+// 주제만 바꾸면 뽑은 카드는 그대로 두고, 풀이만 새로 받게 해요
+document.querySelectorAll('input[name="topic"]').forEach(r => r.addEventListener('change', () => {
+  chooseSpread(); setStatus(); clearOracle();
+  if (state.topic === 'custom') $('topicText').focus();
+}));
 ['nameA', 'nameB'].forEach(id => $(id).addEventListener('input', relabel));
+$('topicText').addEventListener('input', setStatus);
 $('controls').addEventListener('submit', e => e.preventDefault());
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => layoutFan(false), 120); });
 
@@ -682,7 +711,7 @@ function paras(text) {
     const p = document.createElement('p'); p.textContent = t; oracleOut.appendChild(p);
   });
 }
-const drawKey = () => JSON.stringify([state.spread, $('question').value.trim(), state.picks, state.spread === 'compat' ? names() : 0]);
+const drawKey = () => JSON.stringify([state.spread, state.topic, topicName(), $('question').value.trim(), state.picks, state.spread === 'compat' ? names() : 0]);
 const ERRMSG = {
   429: '지금 풀이를 보는 사람이 많아요. 잠시 뒤에 다시 눌러 주세요.',
   403: '이 주소에서는 풀이를 불러올 수 없어요.'
@@ -701,6 +730,8 @@ $('askClaude').addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         spread: state.spread,
+        topic: state.topic,
+        ...(state.topic === 'custom' ? { topicText: cleanText($('topicText').value) } : {}),
         question: $('question').value.trim(),
         cards: state.picks.map(p => ({ n: p.n, rev: !!p.rev })),
         ...(state.spread === 'compat' ? { names: names() } : {})
