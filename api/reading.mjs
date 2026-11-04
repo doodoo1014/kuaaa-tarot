@@ -111,24 +111,45 @@ const L3 = '2~3문단, 모두 합쳐 300~450자';
 const SPREADS = {
   one:    {name:'원 카드', len:'2문단, 모두 합쳐 200~300자',
            pos:[{t:'메시지', d:'지금 마음에 둘 이야기'}]},
-  ppf:    {name:'과거 · 현재 · 미래', len:L3,
+  three:  {name:'쓰리 카드', len:L3, framed:true,   // 자리 틀은 질문을 보고 FRAMES에서 골라요
            pos:[{t:'과거', d:'지금에 이르게 한 흐름'},{t:'현재', d:'지금 마주한 상황'},{t:'미래', d:'이대로 갈 때의 방향'}]},
-  sao:    {name:'상황 · 장애 · 조언', len:L3,
-           pos:[{t:'상황', d:'지금 놓인 자리'},{t:'장애', d:'앞을 가로막는 것'},{t:'조언', d:'풀어 갈 실마리'}]},
-  rel:    {name:'나 · 상대 · 관계', len:L3,
-           guide:"'나'는 질문한 사람, '상대'는 질문 속 상대예요. 상대의 마음은 단정하지 말고 '~일 수 있어요'처럼 조심스럽게 써요.",
-           pos:[{t:'나', d:'이 관계 속 나의 마음'},{t:'상대', d:'상대의 마음'},{t:'관계', d:'둘 사이의 흐름'}]},
-  fork:   {name:'두 갈래 길', len:L3,
-           guide:'질문에 두 선택지가 적혀 있으면 첫 번째 길과 두 번째 길에 각각 맞춰 풀어요. 어느 쪽이 더 나아 보이는지 말할 수는 있지만, 결정은 질문한 사람에게 맡겨요.',
-           pos:[{t:'선택 A', d:'첫 번째 길을 고르면'},{t:'선택 B', d:'두 번째 길을 고르면'},{t:'조언', d:'고르기 전에 기억할 것'}]},
   five:   {name:'파이브 카드', len:'3~4문단, 모두 합쳐 450~650자',
            guide:'과거와 원인에서 시작해 현재, 미래, 가능성 순서로 이어 써요.',
            pos:[{t:'현재', d:'지금 마주한 상황'},{t:'과거', d:'지금에 이르게 한 흐름'},{t:'미래', d:'이대로 갈 때의 방향'},{t:'원인', d:'문제의 뿌리'},{t:'가능성', d:'가장 좋게 풀릴 때의 모습'}]},
-  compat: {name:'궁합', len:L3,
+  compat: {name:'궁합', len:L3, noTopic:true,
            guide:'두 사람이 서로를 떠올리며 한 장씩 고른 궁합 풀이예요. 두 사람을 이름으로 부르며, 각자 상대에게 품은 마음, 두 마음이 어떻게 만나는지, 둘이 함께 해 볼 일 하나를 써요. 점수를 매기거나 헤어짐·결혼 같은 결말을 단정하지 않아요.',
            noQ:'질문 없음. 두 사람의 지금 마음과 어울림을 봐 주세요',
            pos:[{t:'{A}의 마음', d:'{A이} {B를} 떠올리며 고른 것'},{t:'{B}의 마음', d:'{B이} {A를} 떠올리며 고른 것'}]}
 };
+// 쓰리 카드의 자리 틀. 질문을 보고 서버가 하나를 골라요(사이트에는 자리 이름을 띄우지 않아요).
+const FRAMES = {
+  ppf:  {about:'일이나 상황이 앞으로 어떻게 흘러갈지 묻는 질문, 또는 어디에도 딱 맞지 않는 질문',
+         pos:[{t:'과거', d:'지금에 이르게 한 흐름'},{t:'현재', d:'지금 마주한 상황'},{t:'미래', d:'이대로 갈 때의 방향'}]},
+  sao:  {about:'지금 겪는 문제나 고민을 어떻게 풀지, 무엇이 가로막고 있는지 묻는 질문',
+         pos:[{t:'상황', d:'지금 놓인 자리'},{t:'장애', d:'앞을 가로막는 것'},{t:'조언', d:'풀어 갈 실마리'}]},
+  rel:  {about:'특정한 상대와의 관계나 그 사람의 마음을 묻는 질문',
+         guide:"'나'는 질문한 사람, '상대'는 질문 속 그 사람이에요.",
+         pos:[{t:'나', d:'이 관계 속 나의 마음'},{t:'상대', d:'상대의 마음'},{t:'관계', d:'둘 사이의 흐름'}]},
+  fork: {about:'두 가지 선택지 가운데 무엇을 고를지 묻는 질문',
+         guide:'질문 속 두 선택지를 첫 번째 길과 두 번째 길로 보고 각각 풀어요. 어느 쪽이 더 나아 보이는지 말할 수는 있지만, 결정은 질문한 사람에게 맡겨요.',
+         pos:[{t:'선택 A', d:'첫 번째 길을 고르면'},{t:'선택 B', d:'두 번째 길을 고르면'},{t:'조언', d:'고르기 전에 기억할 것'}]}
+};
+const FRAME_SYSTEM = `타로 쓰리 카드 리딩에서, 질문에 가장 맞는 자리 배열을 고르는 일을 해요. 아래 기호 가운데 하나만 답하고, 다른 말은 쓰지 않아요.
+${Object.entries(FRAMES).map(([k, f]) => `${k}: ${f.about}`).join('\n')}`;
+
+// 운세 주제. 사이트의 TOPICS와 키가 같아야 해요.
+const TOPICS = {
+  total:  {name:'총운',       d:'생활 전반의 흐름'},
+  love:   {name:'연애운',     d:'사랑과 연애, 마음이 가는 사람과의 관계'},
+  study:  {name:'학업운',     d:'공부, 시험, 연구와 배움'},
+  career: {name:'진로운',     d:'진로와 일, 앞으로 나아갈 방향'},
+  money:  {name:'금전운',     d:'돈의 흐름과 돈을 대하는 마음. 투자나 큰 지출을 하라 말라 정해 주지는 않아요'},
+  people: {name:'인간관계운', d:'친구, 동료, 가족과의 관계'},
+  custom: {name:'', d:''}   // 관람객이 직접 적은 주제(topicText)
+};
+function topicOf(v) {
+  return v.topic === 'custom' ? { name: v.topicText, d: '관람객이 직접 적은 주제' } : TOPICS[v.topic];
+}
 
 // 받침에 맞춰 조사 붙이기: josa('민지','을','를') → '민지를'
 function josa(word, withFinal, noFinal) {
@@ -150,11 +171,13 @@ const SYSTEM = `당신은 타로 리더예요. 질문한 사람이 뽑은 카드
 - 카드 그림이나 사진, 그 속 천체(성운, 은하, 성단, 달)를 끌어온 비유나 설명
 
 쓰는 방법:
-- 받은 흐름(예: 그동안 → 지금 → 앞으로, 첫 번째 길 → 두 번째 길, 두 사람의 마음)을 "그동안", "지금은", "앞으로는", "이 길을 고르면" 같은 말로 자연스럽게 녹여, 하나의 이야기로 이어 써요.
+- 받은 흐름(예: 그동안 → 지금 → 앞으로, 두 사람의 마음)을 "그동안", "지금은", "앞으로는" 같은 말로 자연스럽게 녹여, 하나의 이야기로 이어 써요.
 - 요청에 '풀이 방식'이 있으면 그대로 따라요.
-- 질문이 있으면 그 질문에 직접 답해요. 질문에 나온 상황을 구체적으로 짚어요.
+- 요청의 '주제'(연애운, 학업운, 또는 관람객이 직접 적은 주제)에 맞춰 풀어요. 질문이 있으면 질문이 먼저예요. 질문에 직접 답하고, 질문에 나온 상황을 구체적으로 짚어요.
+- 다른 사람의 마음은 단정하지 말고 '~일 수 있어요'처럼 조심스럽게 써요.
 - 분량은 요청의 '분량'을 지켜요. 마지막 문장은 지금 할 수 있는 일 하나로 끝내요.
-- 다정한 존댓말(~해요). 단정적인 예언이나 건강·법률·돈에 대한 판단은 하지 않아요.
+- 다정한 존댓말(~해요). 단정적인 예언, 법률 판단, 투자·대출·큰 지출 같은 구체적인 돈 결정은 하지 않아요.
+- 건강에 관한 주제나 질문이면 쉼, 생활 리듬, 몸과 마음을 돌보는 흐름으로만 풀어요. 병이나 증상, 치료, 약에 대한 판단은 하지 않고, 걱정되는 증상이 있다면 병원에서 확인해 보라고 부드럽게 덧붙여요.
 - 질문이 점과 관계없거나 위험한 내용이면, 풀이 대신 한두 문장으로 부드럽게 다른 질문을 권해요.
 - 마크다운 기호 없이 문단으로만 써요.
 
@@ -189,27 +212,61 @@ function validate(body) {
   const nm = Array.isArray(body.names) ? body.names : [];
   const clean = v => String(v || '').replace(/[^\p{L}\p{N} ]/gu, '').trim().slice(0, 10);
   const names = [clean(nm[0]) || '첫 번째 사람', clean(nm[1]) || '두 번째 사람'];
-  return { spread: body.spread, cards, question, names };
+  let topic = Object.prototype.hasOwnProperty.call(TOPICS, body.topic) ? body.topic : 'total';
+  const topicText = clean(body.topicText);
+  if (topic === 'custom' && !topicText) topic = 'total';
+  return { spread: body.spread, topic, topicText, cards, question, names };
 }
 
-function buildPrompt(v) {
+function buildPrompt(v, frame) {
   // 카드 이름·방향·천체 정보는 넘기지 않고, 뽑힌 방향의 뜻만 흐름 순서대로 넘겨요.
   // 그래야 풀이가 "어디에 무엇이 나왔다"는 설명 없이 해석에만 집중해요.
   const sp = SPREADS[v.spread];
+  const pos = frame ? FRAMES[frame].pos : sp.pos;
+  const guide = frame ? FRAMES[frame].guide : sp.guide;
   const lines = v.cards.map((pk, i) => {
     const c = CARDS[pk.n];
     const kw = (pk.rev ? c.rv : c.up).join(', ');
-    const t = fillNames(sp.pos[i].t, v.names), d = fillNames(sp.pos[i].d, v.names);
+    const t = fillNames(pos[i].t, v.names), d = fillNames(pos[i].d, v.names);
     return `${i + 1}. [${t} · ${d}] 키워드: ${kw}. 뜻: ${pk.rev ? c.rvT : c.upT}`;
   }).join('\n');
   return [
-    `질문: ${v.question ? `"${v.question}"` : `(${sp.noQ || '질문 없음. 지금의 전반적인 흐름을 봐 주세요'})`}`,
-    sp.guide ? `풀이 방식: ${fillNames(sp.guide, v.names)}` : '',
+    sp.noTopic ? '' : `주제: ${topicOf(v).name} (${topicOf(v).d})`,
+    `질문: ${v.question ? `"${v.question}"` : `(${sp.noQ || `질문 없음. ${sp.noTopic ? '지금의 전반적인 흐름' : topicOf(v).name + '의 흐름'}을 봐 주세요`})`}`,
+    guide ? `풀이 방식: ${fillNames(guide, v.names)}` : '',
     `흐름:\n${lines}`,
     `분량: ${sp.len}`
   ].filter(Boolean).join('\n');
 }
 
+
+// 질문만 보고(카드는 보지 않고) 쓰리 카드의 자리 틀을 골라요. 실패하면 과거·현재·미래.
+async function pickFrame(v, headers) {
+  if (!v.question) return 'ppf';
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 5000);
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers, signal: ctl.signal,
+      body: JSON.stringify({
+        model: MODEL, max_tokens: 8,
+        thinking: { type: 'disabled' }, output_config: { effort: 'low' },
+        system: FRAME_SYSTEM,
+        messages: [{ role: 'user', content: `주제: ${topicOf(v).name}\n질문: "${v.question}"` }]
+      })
+    });
+    if (!r.ok) { console.log('frame error', r.status, (await r.text().catch(() => '')).slice(0, 300)); return 'ppf'; }
+    const data = await r.json();
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join(' ').toLowerCase();
+    const m = text.match(/\b(ppf|sao|rel|fork)\b/);
+    return m ? m[1] : 'ppf';
+  } catch (e) {
+    console.log('frame failed', String(e));
+    return 'ppf';
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 function corsFor(request) {
   const origin = request.headers.get('origin') || '';
@@ -293,6 +350,9 @@ export default {
     };
     if (process.env.ANTHROPIC_WORKSPACE_ID) headers['anthropic-workspace-id'] = process.env.ANTHROPIC_WORKSPACE_ID;
 
+    const frame = SPREADS[v.spread].framed ? await pickFrame(v, headers) : null;
+    if (frame) console.log('frame', frame);
+
     const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers,
@@ -302,7 +362,7 @@ export default {
         thinking: { type: 'disabled' },      // 생각하는 단계 끄기
         output_config: { effort: 'low' },    // 가장 가볍게
         system: SYSTEM,
-        messages: [{ role: 'user', content: buildPrompt(v) }],
+        messages: [{ role: 'user', content: buildPrompt(v, frame) }],
         stream: true
       })
     });
@@ -312,7 +372,7 @@ export default {
       return json({ error: 'upstream' }, upstream.status === 429 ? 429 : 502, c.headers);
     }
     return new Response(textStream(upstream.body), {
-      headers: { ...c.headers, 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' }
+      headers: { ...c.headers, 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', ...(frame ? { 'X-Frame': frame } : {}) }
     });
   }
 };
