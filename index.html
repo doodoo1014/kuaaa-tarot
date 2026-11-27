@@ -149,13 +149,6 @@ button { font: inherit; }
 .fc:hover, .fc:focus-visible { --lift: -16px; }
 .fc:focus-visible { outline: 2px solid var(--parch); outline-offset: 2px; }
 .fc.taken { opacity: 0; pointer-events: none; --lift: -40px; }
-/* 확정 모드: 겹친 카드에서도 보이도록 왼쪽 위에 번호를 달아요 */
-.fc-n {
-  position: absolute; top: 4%; left: 6%; pointer-events: none;
-  font-family: var(--latin); font-weight: 700; font-size: max(9px, calc(var(--w) * .105)); line-height: 1; letter-spacing: .02em;
-  padding: .28em .38em; border-radius: 4px; color: var(--gold);
-  background: rgba(12, 11, 20, .85); border: 1px solid rgba(201, 160, 106, .5);
-}
 .fan.locked .fc:not(.taken) { cursor: default; --lift: 0px; }   /* 다 고른 뒤에도 남은 카드는 불투명하게 */
 
 /* ---- drawn cards ---- */
@@ -548,7 +541,8 @@ function buildFan() {
     b.type = 'button'; b.className = 'fc';
     if (fixedMode()) {
       b.setAttribute('aria-label', `${CARDS[d.n].r} ${CARDS[d.n].ko} 고르기`);
-      b.innerHTML = `<img src="${img(d.n)}" alt="" draggable="false"><span class="fc-n" aria-hidden="true">${CARDS[d.n].r}</span>`;
+      // 번호표는 그림에 그려 넣었어요 (삼성 인터넷 다크 모드가 CSS 번호표 색을 바꾸는 문제)
+      b.innerHTML = `<img src="cards/fan/${String(d.n).padStart(2, '0')}.jpg" alt="" draggable="false">`;
     } else {
       b.setAttribute('aria-label', `${p + 1}번째 카드 고르기`);
       b.innerHTML = '<img src="cards/back.jpg" alt="" draggable="false">';
