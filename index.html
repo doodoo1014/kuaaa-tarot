@@ -108,6 +108,20 @@ h1 {
 .toggles { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
 .switch { display: inline-flex; gap: 8px; align-items: center; font-size: 14px; color: var(--mute); cursor: pointer; }
 .switch input { accent-color: var(--gold); width: 16px; height: 16px; }
+/* 랜덤 / 확정 스위치 */
+.mode-switch {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 4px; border: 0; background: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  font-family: var(--display); font-weight: 700; font-size: 15px; color: var(--mute);
+}
+.ms-track { position: relative; width: 46px; height: 26px; border-radius: 999px; border: 1px solid var(--gold-dim); background: var(--night); transition: background .25s ease, border-color .25s ease; }
+.ms-knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--gold); transition: transform .25s ease; }
+.mode-switch[aria-checked="true"] .ms-knob { transform: translateX(20px); }
+.mode-switch[aria-checked="true"] .ms-track { background: rgba(201, 160, 106, .2); border-color: var(--gold); }
+.mode-switch[aria-checked="false"] .ms-rand, .mode-switch[aria-checked="true"] .ms-fix { color: var(--parch); }
+.mode-switch:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 999px; }
+/* '다시 섞기' ↔ '다시 고르기'로 글자가 바뀌어도 버튼 폭이 그대로라 스위치가 밀리지 않아요 */
+#shuffle { min-width: 8.4em; min-height: 44px; touch-action: manipulation; }
 button { font: inherit; }
 .btn {
   cursor: pointer; border-radius: 999px; padding: 9px 18px; font-family: var(--display); font-weight: 700;
@@ -135,7 +149,14 @@ button { font: inherit; }
 .fc:hover, .fc:focus-visible { --lift: -16px; }
 .fc:focus-visible { outline: 2px solid var(--parch); outline-offset: 2px; }
 .fc.taken { opacity: 0; pointer-events: none; --lift: -40px; }
-.fan.locked .fc:not(.taken) { cursor: default; opacity: .55; --lift: 0px; }
+/* 확정 모드: 겹친 카드에서도 보이도록 왼쪽 위에 번호를 달아요 */
+.fc-n {
+  position: absolute; top: 4%; left: 6%; pointer-events: none;
+  font-family: var(--latin); font-weight: 700; font-size: max(9px, calc(var(--w) * .105)); line-height: 1; letter-spacing: .02em;
+  padding: .28em .38em; border-radius: 4px; color: var(--gold);
+  background: rgba(12, 11, 20, .85); border: 1px solid rgba(201, 160, 106, .5);
+}
+.fan.locked .fc:not(.taken) { cursor: default; --lift: 0px; }   /* 다 고른 뒤에도 남은 카드는 불투명하게 */
 
 /* ---- drawn cards ---- */
 .slots { display: flex; justify-content: center; align-items: flex-start; gap: 14px; margin: 26px auto 0; flex-wrap: nowrap; }
@@ -166,7 +187,10 @@ button { font: inherit; }
 .face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 6% / 3.5%; overflow: hidden; box-shadow: 0 8px 22px rgba(0,0,0,.6); }
 .face img { width: 100%; height: 100%; display: block; }
 .face.front { transform: rotateY(180deg); }
+.face.front img { transition: transform .45s ease; }
 .face.front.rev img { transform: rotate(180deg); }
+/* 확정 모드: 놓인 카드를 누르면 정·역방향이 바뀌어요 */
+.fixed .slot-card.filled.open { cursor: pointer; }
 .slot-card.filled .flip { animation: drop .45s ease-out; }
 @keyframes drop { from { transform: translateY(-30px) scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
 .slot-card.open .flip { animation: none; }
@@ -305,6 +329,9 @@ footer strong { color: var(--parch); font-family: var(--display); }
           <input id="question" type="text" maxlength="140" placeholder="예: 이번 학기 관측 계획, 어떻게 세우면 좋을까?" autocomplete="off">
         </div>
         <div class="toggles">
+          <button type="button" class="mode-switch" id="modeSwitch" role="switch" aria-checked="false" aria-label="확정 모드: 카드를 직접 골라요">
+            <span class="ms-rand" aria-hidden="true">랜덤</span><span class="ms-track" aria-hidden="true"><span class="ms-knob"></span></span><span class="ms-fix" aria-hidden="true">확정</span>
+          </button>
           <button type="button" class="btn" id="shuffle">다시 섞기</button>
         </div>
       </div>
@@ -357,10 +384,10 @@ footer strong { color: var(--parch); font-family: var(--display); }
 
 <script>
 const CARDS = [
-  {r:'0', en:'THE FOOL', ko:'바보', obj:'바람개비 은하', cat:'M101', con:'큰곰자리', photo:true,
+  {r:'0', en:'THE FOOL', ko:'바보', obj:'팩맨 성운', cat:'NGC 281', con:'카시오페이아자리', photo:true,
    up:['새 출발','자유','모험'], upT:'계획보다 설렘이 앞서는 시작의 순간이에요. 결과를 다 알 수 없어도 첫발을 내딛을 용기가 있다면, 길은 걸으면서 열려요.',
    rv:['무모함','망설임','준비 부족'], rvT:'들뜬 마음에 발밑을 못 보고 있거나, 반대로 두려움 때문에 출발을 미루고 있을 수 있어요. 가볍게 가되 눈은 크게 뜨세요.',
-   sky:'바람 부는 대로 가볍게 도는 바람개비처럼, 근심 없이 길을 나서는 바보예요. 바람개비 은하는 나선팔을 정면으로 활짝 펼친 은하예요.'},
+   sky:'입을 크게 벌린 팩맨처럼, 겁 없이 세상을 한입에 삼키러 길을 나서는 바보예요. 팩맨 성운은 가운데 젊은 별무리가 가스를 밝히고, 앞을 가로지르는 어두운 먼지띠가 벌린 입처럼 보이는 발광 성운이에요.'},
   {r:'I', en:'THE MAGICIAN', ko:'마법사', obj:'마법사 성운', cat:'NGC 7380', con:'케페우스자리', photo:true,
    up:['의지','재능','실행'], upT:'필요한 도구는 이미 손 안에 있어요. 생각을 현실로 옮길 때예요. 집중해서 시작하면 원하는 것을 만들어 낼 수 있어요.',
    rv:['재능 낭비','속임수','산만함'], rvT:'가진 힘을 엉뚱한 데 쓰고 있거나, 말만 앞서고 실행이 따르지 않을 수 있어요. 그럴듯한 말일수록 한 번 더 확인하세요.',
@@ -498,23 +525,34 @@ function positions() {
 }
 
 const fan = $('fan'), slotsEl = $('slots'), readingsEl = $('readings'), statusEl = $('status');
-let state = { spread:'three', topic:'total', deck:[], picks:[], open:[] };
+// mode: 'random' = 뒷면으로 섞인 덱에서 뽑기, 'fixed' = 0번부터 앞면으로 펼쳐 놓고 직접 고르기
+let state = { spread:'three', topic:'total', mode:'random', deck:[], picks:[], open:[] };
+const fixedMode = () => state.mode === 'fixed';
 const readingName = () => SPREADS[state.spread].name + (state.spread === 'compat' ? '' : ` · ${topicName()}`);
-let fanEls = [];
+let fanEls = [], fanMode = '';
 
 function shuffledDeck(withRev) {
   const a = CARDS.map((_, i) => i);
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
   return a.map(n => ({ n, rev: withRev && Math.random() < 0.5 }));
 }
+// 확정 모드의 덱: 0번 바보부터 21번 세계까지 순서대로, 모두 정방향으로 시작
+const orderedDeck = () => CARDS.map((_, n) => ({ n, rev: false }));
 
 function buildFan() {
   fan.innerHTML = '';
-  fanEls = state.deck.map((_, p) => {
+  fanMode = state.mode;
+  fan.setAttribute('aria-label', fixedMode() ? '순서대로 펼쳐진 22장의 카드' : '펼쳐진 22장의 카드');
+  fanEls = state.deck.map((d, p) => {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'fc';
-    b.setAttribute('aria-label', `${p + 1}번째 카드 고르기`);
-    b.innerHTML = '<img src="cards/back.jpg" alt="" draggable="false">';
+    if (fixedMode()) {
+      b.setAttribute('aria-label', `${CARDS[d.n].r} ${CARDS[d.n].ko} 고르기`);
+      b.innerHTML = `<img src="${img(d.n)}" alt="" draggable="false"><span class="fc-n" aria-hidden="true">${CARDS[d.n].r}</span>`;
+    } else {
+      b.setAttribute('aria-label', `${p + 1}번째 카드 고르기`);
+      b.innerHTML = '<img src="cards/back.jpg" alt="" draggable="false">';
+    }
     b.addEventListener('click', () => pick(p));
     fan.appendChild(b);
     return b;
@@ -524,9 +562,10 @@ function buildFan() {
 function layoutFan(stacked) {
   const cw = fan.clientWidth;
   const N = fanEls.length;
-  const rows = cw < 440 ? 3 : cw < 720 ? 2 : 1;
+  // 확정 모드의 휴대폰 화면은 4줄로 펼쳐 카드가 덜 겹치게 해요 (앞면을 보고 정확히 누를 수 있게)
+  const rows = cw < 440 ? (fixedMode() ? 4 : 3) : cw < 720 ? 2 : 1;
   const per = Math.ceil(N / rows);
-  const w = rows === 1 ? Math.min(Math.max(cw * 0.105, 74), 110) : Math.min(cw * (rows === 3 ? 0.19 : 0.15), 96);
+  const w = rows === 1 ? Math.min(Math.max(cw * 0.105, 74), 110) : Math.min(cw * (rows >= 3 ? 0.19 : 0.15), 96);
   const h = w * 1028 / 600;
   const half = (rows === 1 ? 30 : 22) * Math.PI / 180;
   const reach = cw / 2 - (w / 2) * Math.cos(half) - h * Math.sin(half) - 4;
@@ -550,7 +589,7 @@ function layoutFan(stacked) {
 function buildSlots() {
   const pos = positions();
   slotsEl.innerHTML = '';
-  slotsEl.className = 'slots' + (state.spread === 'five' ? ' cross' : state.spread === 'compat' ? ' pair' : '');
+  slotsEl.className = 'slots' + (state.spread === 'five' ? ' cross' : state.spread === 'compat' ? ' pair' : '') + (fixedMode() ? ' fixed' : '');
   pos.forEach((p, i) => {
     const s = document.createElement('div');
     s.className = 'slot';
@@ -559,7 +598,9 @@ function buildSlots() {
       </button><div class="pos"><span class="pos-t">${esc(p.t)}</span><small>${esc(p.d)}</small></div>`;
     if (!p.d) s.querySelector('.pos small').hidden = true;
     slotsEl.appendChild(s);
-    s.querySelector('.slot-card').addEventListener('click', () => openSlot(i));
+    s.querySelector('.slot-card').addEventListener('click', () => {
+      if (fixedMode() && state.open[i]) flipDirection(i); else openSlot(i);
+    });
   });
 }
 
@@ -570,14 +611,20 @@ function relabel() {
     s.querySelector('.pos-t').textContent = pos[i].t;
     s.querySelector('.pos small').textContent = pos[i].d;
     const card = s.querySelector('.slot-card'), pk = state.picks[i];
-    card.setAttribute('aria-label', state.open[i] ? `${pos[i].t}: ${CARDS[pk.n].ko}${pk.rev ? ' 역방향' : ''}`
+    card.setAttribute('aria-label', state.open[i] ? openLabel(i, pos)
       : pk ? `${pos[i].t} 자리 카드 뒤집기` : `${pos[i].t} 자리, 아직 카드 없음`);
   });
   renderReadings();
   setStatus();
 }
 
+function openLabel(i, pos = positions()) {
+  const pk = state.picks[i], c = CARDS[pk.n];
+  return `${pos[i].t}: ${c.ko}${pk.rev ? ' 역방향' : ' 정방향'}` + (fixedMode() ? ', 누르면 방향이 바뀌어요' : '');
+}
+
 function pickHint(got) {
+  if (fixedMode()) return '원하는 카드를 순서대로 누르세요. 놓인 카드를 누르면 정방향·역방향이 바뀌어요.';
   if (state.spread === 'compat') {
     const [A, B] = names();
     return got === 0 ? `${josa(A, '이', '가')} ${josa(B, '을', '를')} 떠올리며 끌리는 카드를 누르세요.`
@@ -593,6 +640,8 @@ function setStatus() {
     statusEl.innerHTML = `카드를 ${need}장 고르세요 <span class="latin">${got} / ${need}</span><small>${esc(pickHint(got))}</small>`;
   } else if (opened < need) {
     statusEl.innerHTML = `카드를 뒤집어 보세요<small>아래 카드를 하나씩 누르거나 모두 뒤집기를 누르세요.</small>`;
+  } else if (fixedMode()) {
+    statusEl.innerHTML = `${esc(readingName())} 풀이<small>놓인 카드를 누르면 정방향·역방향이 바뀌어요. 처음부터 고르려면 ‘다시 고르기’를 누르세요.</small>`;
   } else {
     statusEl.innerHTML = `${esc(readingName())} 풀이<small>다시 보려면 ‘다시 섞기’를 누르세요.</small>`;
   }
@@ -602,11 +651,13 @@ function setStatus() {
 }
 
 function reset(animate) {
-  state.deck = shuffledDeck(true);   // 정방향·역방향이 늘 섞여 나와요
+  // 랜덤: 정방향·역방향이 늘 섞여 나와요. 확정: 순서대로 앞면, 방향은 고른 뒤에 정해요
+  state.deck = fixedMode() ? orderedDeck() : shuffledDeck(true);
   state.picks = []; state.open = [];
   readingsEl.innerHTML = '';
   $('oracle').hidden = true; clearOracle();
-  if (!fanEls.length || fanEls.length !== state.deck.length) buildFan();
+  $('shuffle').textContent = fixedMode() ? '다시 고르기' : '다시 섞기';
+  if (!fanEls.length || fanEls.length !== state.deck.length || fanMode !== state.mode) buildFan();
   fanEls.forEach(el => { el.classList.remove('taken'); el.disabled = false; });
   buildSlots();
   if (animate && !reduceMotion) {
@@ -621,12 +672,27 @@ function pick(p) {
   if (state.picks.length >= need || fanEls[p].classList.contains('taken')) return;
   fanEls[p].classList.add('taken'); fanEls[p].disabled = true;
   const i = state.picks.length;
-  state.picks.push(state.deck[p]);
+  state.picks.push({ ...state.deck[p] });   // 확정 모드에서 방향을 바꿔도 덱은 그대로
   const slot = $('slot' + i);
   slot.classList.add('filled'); slot.disabled = false;
   slot.setAttribute('aria-label', `${positions()[i].t} 자리 카드 뒤집기`);
   setStatus();
   if (state.picks.length === need) fanEls.forEach(el => { if (!el.classList.contains('taken')) el.disabled = true; });
+  if (fixedMode()) openSlot(i);           // 고른 카드는 바로 앞면으로 놓여요
+}
+
+// 확정 모드: 놓인 카드를 누르면 정방향 ↔ 역방향
+function flipDirection(i) {
+  const pk = state.picks[i];
+  if (!pk || !state.open[i]) return;
+  pk.rev = !pk.rev;
+  const slot = $('slot' + i), front = slot.querySelector('.face.front'), c = CARDS[pk.n];
+  front.classList.toggle('rev', pk.rev);
+  front.querySelector('img').alt = `${c.ko} 카드 (${c.obj})${pk.rev ? ', 역방향' : ''}`;
+  slot.setAttribute('aria-label', openLabel(i));
+  renderReadings();
+  // 카드가 바뀌었으니 이전 풀이는 지우고 다시 듣게 해요
+  if (!$('oracle').hidden) clearOracle();
 }
 
 function openSlot(i) {
@@ -639,8 +705,8 @@ function openSlot(i) {
   const im = front.querySelector('img');
   im.src = img(pk.n); im.alt = `${c.ko} 카드 (${c.obj})${pk.rev ? ', 역방향' : ''}`;
   slot.classList.add('open');
-  slot.setAttribute('aria-label', `${positions()[i].t}: ${c.ko}${pk.rev ? ' 역방향' : ''}`);
   state.open[i] = true;
+  slot.setAttribute('aria-label', openLabel(i));
   renderReadings();
   setStatus();
   if (state.open.filter(Boolean).length === SPREADS[state.spread].pos.length) showOracle();
@@ -673,6 +739,11 @@ $('revealAll').addEventListener('click', () => {
   state.picks.forEach((_, i) => setTimeout(() => openSlot(i), reduceMotion ? 0 : i * 260));
 });
 $('shuffle').addEventListener('click', () => reset(true));
+$('modeSwitch').addEventListener('click', () => {
+  state.mode = fixedMode() ? 'random' : 'fixed';
+  $('modeSwitch').setAttribute('aria-checked', String(fixedMode()));
+  reset(true);
+});
 function chooseSpread() {
   state.spread = document.querySelector('input[name="kind"]:checked').value;
   state.topic = document.querySelector('input[name="topic"]:checked').value;
